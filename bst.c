@@ -12,6 +12,7 @@ void freeRecursive(BSTNODE *node, BST *t);
 void levelOrder(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq);
 int BSTmaximum(BSTNODE *root);
 int BSTminimum(BSTNODE *root);
+int isLeft(BST *t, BSTNODE *node, BSTNODE *parent);
 
 struct bstnode
 {
@@ -454,6 +455,87 @@ levelOrder(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
     return;
 }
 
+void
+displayBSTdecorated(BST *t,FILE *fp) {
+    if (t->root == NULL) {
+        return;
+    }
+    else {
+        QUEUE *newq = newQUEUE(t->display, t->free);
+        QUEUE *oldq = newQUEUE(t->display, t->free);
+        levelOrderDecorated(t, t->root, fp, newq, oldq);
+        freeQUEUE(newq);
+        freeQUEUE(oldq);
+        return;
+    }
+
+}
+
+void
+levelOrderDecorated(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
+    int j = 0;
+    t->display(node->data, fp);
+    fprintf(fp, "(");
+    t->display(node->data, fp);
+    fprintf(fp, ")");
+    fprintf(fp, "X");
+    fprintf(fp, "\n");
+    j ++;
+    enqueue(oldq, node);
+
+    while (j<sizeBST(t)) {
+        int oldsize = sizeQUEUE(oldq);
+        for (int i=0; i<oldsize; i++) {
+            node = dequeue(oldq);
+            if (node->left != NULL) {
+                enqueue(newq, node->left);
+            }
+            if (node->right != NULL) {
+                enqueue(newq, node->right);
+            }
+        }
+        int newsize = sizeQUEUE(newq);
+        for (int x=0; x<newsize; x++) {
+            node = dequeue(newq);
+            if (getBSTNODEleft(node)==NULL && getBSTNODEright(node)==NULL) {
+                fprintf(fp, "=");
+            }
+            t->display(node->data, fp);
+            fprintf(fp, "(");
+            t->display(getBSTNODEvalue(getBSTNODEparent(node)), fp);
+            fprintf(fp, ")");
+            if (isLeft(t, node, getBSTNODEparent(node)) == 1) {
+                fprintf(fp, "L");
+            }
+            else {
+                fprintf(fp, "R");
+            }
+            enqueue(oldq, node);
+            if (x < newsize-1) {fprintf(fp, " ");}
+            j ++;
+        }
+        fprintf(fp, "\n");
+    }
+    while (sizeQUEUE(oldq) > 0) {
+    // for (int i=0; i<=sizeQUEUE(oldq); i++) {
+        // printf("soize: %d\n", sizeQUEUE(oldq));
+        dequeue(oldq);
+    }
+    return;
+
+}
+
+int
+isLeft(BST *t, BSTNODE *node, BSTNODE *parent) {
+    BSTNODE *maybe = getBSTNODEleft(parent);
+    if (t->compare(getBSTNODEvalue(node),getBSTNODEvalue(maybe)) == 0) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
+
 extern void freeBST(BST *t) {
     if (t->root == NULL) {
         free(t);
@@ -493,9 +575,6 @@ freeRecursive(BSTNODE *node, BST *t) {
         //printf("\n");
         freeBSTNODE(temp, t->free);
     }
-
-
-
 }
 
 BSTNODE *

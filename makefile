@@ -1,4 +1,4 @@
-OBJS = integer.o real.o string.o sll.o dll.o stack.o queue.o heap.o a.out bst.o sll-*-*.o dll-*-*.o stack-*-*.o queue-*-*.o
+OBJS = integer.o real.o string.o sll.o dll.o stack.o queue.o heap.o a.out bst.o sll-*-*.o dll-*-*.o stack-*-*.o queue-*-*.o gst-*-*.o
 LOPTS = -Wall -Wextra -std=c99
 EXTRAS = integer.c real.c string.c sll.c dll.c stack.c queue.c
 OEXTRAS = integer.o real.o string.o sll.o dll.o stack.o queue.o
@@ -25,6 +25,10 @@ test-bst :
 	gcc $(LOPTS) -c bst.c $(EXTRAS) tests/bst-0-10.c
 	gcc $(LOPTS) bst-0-10.o $(OEXTRAS) bst.o -o test-bst
 
+test-gst :
+	gcc $(LOPTS) -c gst.c bst.c $(EXTRAS) tests/submission0/gst-0-0.c
+	gcc $(LOPTS) gst-0-0.o $(OEXTRAS) bst.o gst.o -o test-gst
+
 
 valgrind :
 	echo testing singly-linked list
@@ -42,6 +46,9 @@ valgrind :
 	echo testing bst
 	valgrind ./test-bst
 	echo
+	echo testing gst
+	valgrind ./test-gst
+	echo
 
 test :
 	./test-sll
@@ -49,6 +56,7 @@ test :
 	./test-stack
 	./test-queue
 	./test-bst
+	./test-gst
 
 clean :
-	rm -f $(OBJS) test-*.o bst-*-*.o test-bst test-sll test-dll test-stack test-queue
+	rm -f $(OBJS) test-*.o bst-*-*.o test-bst test-sll test-dll test-stack test-queue test-gst
