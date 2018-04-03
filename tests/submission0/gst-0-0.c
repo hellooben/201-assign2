@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "bst.h"
-#include "gst.h"
-#include "integer.h"
-#include "real.h"
-#include "string.h"
+#include "../../bst.h"
+#include "../../gst.h"
+#include "../../integer.h"
+#include "../../real.h"
+#include "../../string.h"
 
 void srandom(unsigned int);
 long int random(void);
@@ -15,9 +15,13 @@ main(void)
     srandom(41);
     //simple INTEGER test of GST
     GST *p = newGST(displayINTEGER,compareINTEGER,freeINTEGER);
+    // printf("made the gst!\n");
     insertGST(p,newINTEGER(3));
+    // printf("inserted the first\n");
     insertGST(p,newINTEGER(2));
+    // printf("inserted the second\n");
     insertGST(p,newINTEGER(1));
+    // printf("inserted!\n");
     printf("GST:\n");
     displayGST(p,stdout);
     printf("debug: ");

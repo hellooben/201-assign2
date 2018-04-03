@@ -9,7 +9,7 @@ typedef struct gst GST;
 
 extern GST *newGST(
     void (*)(void *,FILE *),           //display
-    int (*)(void *,void *)),           //comparator
+    int (*)(void *,void *),           //comparator
     void (*)(void *));                 //freeing function
 extern void insertGST(GST *,void *);
 extern int findGSTcount(GST *,void *);

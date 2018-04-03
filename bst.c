@@ -12,6 +12,7 @@ void freeRecursive(BSTNODE *node, BST *t);
 void levelOrder(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq);
 int BSTmaximum(BSTNODE *root);
 int BSTminimum(BSTNODE *root);
+void levelOrderDecorated(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq);
 int isLeft(BST *t, BSTNODE *node, BSTNODE *parent);
 
 struct bstnode
@@ -169,7 +170,9 @@ setBSTsize(BST *t,int s) {
 
 extern BSTNODE *
 insertBST(BST *t,void *value) {
+    // printf("in insert\n");
     if (t->root == NULL) {
+        // printf("root is null. SETTING ROOT\n");
         BSTNODE *new = newBSTNODE(value);
         assert(new!=0);
         t->root = new;
@@ -178,6 +181,7 @@ insertBST(BST *t,void *value) {
         return new;
     }
     else {
+        // printf("root is not null!\n");
         //BSTNODE *curr = t->root;
 
         BSTNODE *returnable = binaryInsert(t, t->root, t->root, value);
@@ -188,6 +192,25 @@ insertBST(BST *t,void *value) {
     }
 }
 
+BSTNODE *
+binaryInsert(BST *t, BSTNODE *node, BSTNODE *prev, void *value) {
+    if (node == NULL) {
+        // printf("NULL NODE, setting the parent\n");
+        BSTNODE *new = newBSTNODE(value);
+        new->parent = prev;
+        return new;
+    }
+    else if (t->compare(node->data, value) < 0) {
+        // printf("going right!\n");
+        node->right = binaryInsert(t, node->right, node, value);
+    }
+    else if (t->compare(node->data, value) > 0) {
+        // printf("going left!\n");
+        node->left = binaryInsert(t, node->left, node, value);
+    }
+    return node;
+}
+
 extern BSTNODE *
 findBST(BST *t,void *value) {
     if (t->root == NULL) {
@@ -195,6 +218,7 @@ findBST(BST *t,void *value) {
     }
     else {
         BSTNODE *curr = t->root;
+        // printf("about to binary find\n");
         BSTNODE *returnable = binaryFind(t, curr, value);
         return returnable;
     }
@@ -202,9 +226,20 @@ findBST(BST *t,void *value) {
 
 BSTNODE *
 binaryFind(BST *t, BSTNODE *node, void *value) {
+    // printf("IN BINARY FIND\n");
     if (node == NULL) {
+        // printf("NODE IS NULL!\n");
         return node;
     }
+    // printf("LOOKING FOR : ");
+    // t->display(value, stdout);
+    // printf("\n");
+    // printf("COMPARING : ");
+    // t->display(getBSTNODEvalue(node), stdout);
+    // printf(" and \n");
+    // t->display(value, stdout);
+    // printf("\n");
+    // printf("COMPARE RESULT: %d\n", t->compare(node->data, value));
     if (t->compare(node->data, value) == 0) {
         return node;
     }
@@ -455,7 +490,7 @@ levelOrder(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
     return;
 }
 
-void
+extern void
 displayBSTdecorated(BST *t,FILE *fp) {
     if (t->root == NULL) {
         return;
@@ -474,6 +509,8 @@ displayBSTdecorated(BST *t,FILE *fp) {
 void
 levelOrderDecorated(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
     int j = 0;
+    int lines = 0;
+    fprintf(fp, "%d: ", lines);
     t->display(node->data, fp);
     fprintf(fp, "(");
     t->display(node->data, fp);
@@ -481,6 +518,7 @@ levelOrderDecorated(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
     fprintf(fp, "X");
     fprintf(fp, "\n");
     j ++;
+    lines ++;
     enqueue(oldq, node);
 
     while (j<sizeBST(t)) {
@@ -495,6 +533,7 @@ levelOrderDecorated(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
             }
         }
         int newsize = sizeQUEUE(newq);
+        fprintf(fp, "%d: ", lines);
         for (int x=0; x<newsize; x++) {
             node = dequeue(newq);
             if (getBSTNODEleft(node)==NULL && getBSTNODEright(node)==NULL) {
@@ -515,6 +554,7 @@ levelOrderDecorated(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
             j ++;
         }
         fprintf(fp, "\n");
+        lines ++;
     }
     while (sizeQUEUE(oldq) > 0) {
     // for (int i=0; i<=sizeQUEUE(oldq); i++) {
@@ -528,7 +568,7 @@ levelOrderDecorated(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
 int
 isLeft(BST *t, BSTNODE *node, BSTNODE *parent) {
     BSTNODE *maybe = getBSTNODEleft(parent);
-    if (t->compare(getBSTNODEvalue(node),getBSTNODEvalue(maybe)) == 0) {
+    if (maybe != NULL && t->compare(getBSTNODEvalue(node),getBSTNODEvalue(maybe)) == 0) {
         return 1;
     }
     else {
@@ -575,22 +615,6 @@ freeRecursive(BSTNODE *node, BST *t) {
         //printf("\n");
         freeBSTNODE(temp, t->free);
     }
-}
-
-BSTNODE *
-binaryInsert(BST *t, BSTNODE *node, BSTNODE *prev, void *value) {
-    if (node == NULL) {
-        BSTNODE *new = newBSTNODE(value);
-        new->parent = prev;
-        return new;
-    }
-    else if (t->compare(node->data, value) < 0) {
-        node->right = binaryInsert(t, node->right, node, value);
-    }
-    else if (t->compare(node->data, value) > 0) {
-        node->left = binaryInsert(t, node->left, node, value);
-    }
-    return node;
 }
 
 void

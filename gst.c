@@ -4,14 +4,9 @@
 #include <stdio.h>
 #include <assert.h>
 
-GSTVAL *newGSTVAL(void*,GST*);
-void displayGSTVAL(void *,FILE *);
-int compareGSTVAL(void *, void *);
-void updateFREQ(GSTVAL *,int);
-int getFREQ(GSTVAL *);
-void *getGSTVAL(GSTVAL *);
 
-typdef struct gstval
+
+typedef struct gstval
 {
     void *data;
     int freq;
@@ -22,18 +17,33 @@ typdef struct gstval
 } GSTVAL;
 
 GSTVAL *
-newGSTVAL(void *v, GST *g) {
+newGSTVAL(void *v,
+void (*d)(void *,FILE *),           //display
+int (*c)(void *,void *),           //comparator
+void (*f)(void *)) {
     GSTVAL *new = malloc(sizeof(GSTVAL));
     new->data = v;
     new->freq = 1;
-    new->display = g->display;
-    new->compare = g->compare;
-    new->free = g->free;
+    new->display = d;
+    new->compare = c;
+    new->free = f;
     return new;
 }
 
+GSTVAL *newGSTVAL(void*,
+void (*d)(void *,FILE *),           //display
+int (*c)(void *,void *),           //comparator
+void (*f)(void *));
+void displayGSTVAL(void *,FILE *);
+int compareGSTVAL(void *, void *);
+void freeGSTVAL(void *);
+void updateFREQ(GSTVAL *,int);
+int getFREQ(GSTVAL *);
+void *getGSTVAL(GSTVAL *);
+
 void displayGSTVAL(void *val, FILE *fp) {
-    val->display(getGSTVAL(val),fp);
+    GSTVAL *temp = val;
+    temp->display(getGSTVAL(temp),fp);
     if (getFREQ(val) > 1) {
         fprintf(fp, "[%d]", getFREQ(val));
     }
@@ -41,7 +51,17 @@ void displayGSTVAL(void *val, FILE *fp) {
 }
 
 int compareGSTVAL(void *v1, void *v2) {
-    return v1->compare(getGSTVAL(v1),getGSTVAL(v2));
+    GSTVAL *temp = v1;
+    GSTVAL *temp2 = v2;
+    return temp->compare(getGSTVAL(temp),getGSTVAL(temp2));
+}
+
+void freeGSTVAL(void *val) {
+    GSTVAL *temp = val;
+    if (temp->free) {
+        temp->free(getGSTVAL(temp));
+    }
+    return;
 }
 
 void updateFREQ(GSTVAL *val, int num) {
@@ -78,13 +98,13 @@ struct gst
 
 extern GST *
 newGST(void (*d)(void *,FILE *),           //display
-int (*c)(void *,void *)),           //comparator
+int (*c)(void *,void *),           //comparator
 void (*f)(void *)) {                 //free
     GST *tree = malloc(sizeof(GST));
     assert(tree!=0);
 
     tree->size = 0;
-    tree->bstree = newBST(displayGSTVAL, compareGSTVAL, 0, f);
+    tree->bstree = newBST(displayGSTVAL, compareGSTVAL, 0, freeGSTVAL);
     tree->display = d;
     tree->compare = c;
     tree->free = f;
@@ -93,58 +113,73 @@ void (*f)(void *)) {                 //free
 
 extern void
 insertGST(GST *g,void *value) {
-    BSTNODE *temp = findBST(g->bstree, value);
+    // printf("IN INSERTGST\n");
+    GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
+    BSTNODE *temp = findBST(g->bstree, new);
+    // printf("result of findBST awaits!!!!!!!:\n");
     if (temp != NULL) {
+        // printf("found it!\n");
         updateFREQ(getBSTNODEvalue(temp),1);
         g->size ++;
     }
     else {
-        GSTVAL *new = newGSTVAL(value, g);
+        // printf("didnt find it!\n");
+        // printf("Made the new GSTVAL!\n");
         insertBST(g->bstree, new);
         g->size ++;
     }
+    // freeGSTVAL(new);
     return;
 }
 
 extern int
 findGSTcount(GST *g,void *value) {
-    BSTNODE *temp = findBST(g->bstree, value);
+    GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
+    BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
+        // freeGSTVAL(new);
         return getFREQ(getBSTNODEvalue(temp));
     }
     else {
+        // freeGSTVAL(new);
         return 0;
     }
 }
 
 extern void *
 findGST(GST *g,void *value) {
-    BSTNODE *temp = findBST(g->bstree, value);
+    GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
+    BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
+        // freeGSTVAL(new);
         return getGSTVAL(getBSTNODEvalue(temp));
     }
     else {
-        printf("Value ");
-        g->display(value, stdout);
-        printf(" not found\n");
+        // printf("Value ");
+        // g->display(value, stdout);
+        // printf(" not found\n");
+        // freeGSTVAL(new);
         return NULL;
     }
 }
 
 extern void *
 deleteGST(GST *g,void *value) {
-    BSTNODE *temp = findBST(g->bstree, value);
+    GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
+    BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
         if (getFREQ(getBSTNODEvalue(temp)) > 1) {
-            updateFREQ(temp, -1);
+            updateFREQ(getBSTNODEvalue(temp), -1);
             g->size --;
+            // freeGSTVAL(new);
             return getGSTVAL(getBSTNODEvalue(temp));
         }
         else {
             temp = swapToLeafBST(g->bstree, temp);
-            pruneLeafBST(h->bstree, temp);
-            setBSTsize(h->bstree, sizeBST(h->bstree)-1);
+            pruneLeafBST(g->bstree, temp);
+            setBSTsize(g->bstree, sizeBST(g->bstree)-1);
             g->size --;
+            // freeGSTVAL(new);
             return getGSTVAL(getBSTNODEvalue(temp));
         }
     }
@@ -152,6 +187,7 @@ deleteGST(GST *g,void *value) {
         printf("Value ");
         g->display(value, stdout);
         printf(" not found\n");
+        freeGSTVAL(new);
         return NULL;
     }
 }
@@ -169,7 +205,7 @@ duplicates(GST *g) {
 extern void
 statisticsGST(GST *g,FILE *fp) {
     fprintf(fp, "Duplicates: %d\n", duplicates(g));
-    statisticsBST(g, fp);
+    statisticsBST(g->bstree, fp);
     return;
 }
 
@@ -182,5 +218,12 @@ displayGST(GST *g,FILE *fp) {
 extern void
 displayGSTdebug(GST *g,FILE *fp) {
     displayBST(g->bstree, fp);
+    return;
+}
+
+extern void
+freeGST(GST *g) {
+    freeBST(g->bstree);
+    free(g);
     return;
 }
