@@ -503,7 +503,6 @@ displayBSTdecorated(BST *t,FILE *fp) {
         freeQUEUE(oldq);
         return;
     }
-
 }
 
 void
@@ -582,9 +581,10 @@ extern void freeBST(BST *t) {
         return;
     }
     else {
-        //printf("in free, queue size is %d, tree size is %d\n", sizeQUEUE(t->list), sizeBST(t));
-        //displayQUEUE(t->list, stdout);
-        //printf("\n");
+        // printf("in free, queue size is %d, tree size is %d\n", sizeQUEUE(t->list), sizeBST(t));
+        // displayQUEUE(t->list, stdout);
+        // printf("\n");
+        // printf("IN FREE\n");
         BSTNODE *curr = t->root;
         freeRecursive(curr, t);
         //freeQUEUE(t->list);
@@ -601,18 +601,18 @@ freeRecursive(BSTNODE *node, BST *t) {
     }
     BSTNODE *temp = node;
     if (temp->right != NULL && t->free != NULL) {
-        //t->display(getBSTNODEvalue(temp), stdout);
-        //printf("'s right is present'\n");
+        // t->display(getBSTNODEvalue(temp), stdout);
+        // printf("'s right is present'\n");
         freeRecursive(getBSTNODEright(temp), t);
     }
     if (temp->left != NULL && t->free != NULL) {
-        //t->display(getBSTNODEvalue(temp), stdout);
-        //printf("'s left is present'\n");
+        // t->display(getBSTNODEvalue(temp), stdout);
+        // printf("'s left is present'\n");
         freeRecursive(getBSTNODEleft(temp), t);
     }
     if (t->free != NULL) {
-        //t->display(getBSTNODEvalue(temp), stdout);
-        //printf("\n");
+        // t->display(getBSTNODEvalue(temp), stdout);
+        // printf("\n");
         freeBSTNODE(temp, t->free);
     }
 }

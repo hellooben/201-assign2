@@ -53,8 +53,10 @@ main(void)
     printf(" present? %s\n",findGST(p,q) == 0? "no" : "yes");
     printf("size: %d\n",sizeGST(p));
     statisticsGST(p,stdout);
+    // printf("whats up\n");
     freeINTEGER(q);
     freeINTEGER(r);
+    // printf("what's up\n");
     freeGST(p);
     return 0;
     }

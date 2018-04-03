@@ -45,7 +45,7 @@ void displayGSTVAL(void *val, FILE *fp) {
     GSTVAL *temp = val;
     temp->display(getGSTVAL(temp),fp);
     if (getFREQ(val) > 1) {
-        fprintf(fp, "[%d]", getFREQ(val));
+        fprintf(fp, "[%d]", getFREQ(temp));
     }
     return;
 }
@@ -60,6 +60,7 @@ void freeGSTVAL(void *val) {
     GSTVAL *temp = val;
     if (temp->free) {
         temp->free(getGSTVAL(temp));
+        free(val);
     }
     return;
 }
@@ -121,6 +122,7 @@ insertGST(GST *g,void *value) {
         // printf("found it!\n");
         updateFREQ(getBSTNODEvalue(temp),1);
         g->size ++;
+        freeGSTVAL(new);
     }
     else {
         // printf("didnt find it!\n");
@@ -137,11 +139,11 @@ findGSTcount(GST *g,void *value) {
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
-        // freeGSTVAL(new);
+        freeGSTVAL(new);
         return getFREQ(getBSTNODEvalue(temp));
     }
     else {
-        // freeGSTVAL(new);
+        freeGSTVAL(new);
         return 0;
     }
 }
@@ -151,8 +153,9 @@ findGST(GST *g,void *value) {
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
+        void *returnable = getGSTVAL(getBSTNODEvalue(temp));
         // freeGSTVAL(new);
-        return getGSTVAL(getBSTNODEvalue(temp));
+        return returnable;
     }
     else {
         // printf("Value ");
@@ -168,11 +171,13 @@ deleteGST(GST *g,void *value) {
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
+        void *returnable = getGSTVAL(getBSTNODEvalue(temp));
         if (getFREQ(getBSTNODEvalue(temp)) > 1) {
             updateFREQ(getBSTNODEvalue(temp), -1);
             g->size --;
             // freeGSTVAL(new);
-            return getGSTVAL(getBSTNODEvalue(temp));
+            return returnable;
+            // return getGSTVAL(getBSTNODEvalue(temp));
         }
         else {
             temp = swapToLeafBST(g->bstree, temp);
@@ -180,7 +185,8 @@ deleteGST(GST *g,void *value) {
             setBSTsize(g->bstree, sizeBST(g->bstree)-1);
             g->size --;
             // freeGSTVAL(new);
-            return getGSTVAL(getBSTNODEvalue(temp));
+            return returnable;
+            // return getGSTVAL(getBSTNODEvalue(temp));
         }
     }
     else {
