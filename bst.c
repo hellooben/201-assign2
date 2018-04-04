@@ -106,9 +106,8 @@ freeBSTNODE(BSTNODE *n,void (*f)(void *)) {
     if (f != NULL) {
         f(n->data);
         free(n);
-        return;
     }
-    else {return;}
+    return;
 }
 
 
@@ -499,6 +498,7 @@ displayBSTdecorated(BST *t,FILE *fp) {
         QUEUE *newq = newQUEUE(t->display, t->free);
         QUEUE *oldq = newQUEUE(t->display, t->free);
         levelOrderDecorated(t, t->root, fp, newq, oldq);
+        // printf("SIZES: %d, %d\n", sizeQUEUE(newq),sizeQUEUE(oldq));
         freeQUEUE(newq);
         freeQUEUE(oldq);
         return;

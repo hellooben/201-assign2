@@ -42,6 +42,9 @@ main(void)
     displayINTEGER(q,stdout);
     printf(" present? %s\n",findGST(p,q) == 0? "no" : "yes");
     setINTEGER(r,2);
+    printf("debug: ");
+    displayGSTdebug(p,stdout);
+    printf("\n");
     freeINTEGER(deleteGST(p,r));
     printf("GST:\n");
     displayGST(p,stdout);
