@@ -139,7 +139,7 @@ insertGST(GST *g,void *value) {
     return;
 }
 
-extern int //VALGRIND WORK!!!!!!
+extern int
 findGSTcount(GST *g,void *value) {
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
@@ -155,7 +155,7 @@ findGSTcount(GST *g,void *value) {
     }
 }
 
-extern void * //VALGRIND WORK!!!!!!
+extern void *
 findGST(GST *g,void *value) {
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
@@ -175,7 +175,7 @@ findGST(GST *g,void *value) {
     }
 }
 
-extern void * //VALGRIND WORK!!!!!!
+extern void *
 deleteGST(GST *g,void *value) {
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
@@ -210,9 +210,9 @@ deleteGST(GST *g,void *value) {
         }
     }
     else {
-        printf("Value ");
-        new->display(value, stdout);
-        printf(" not found!!!!\n");
+        // printf("Value ");
+        // new->display(value, stdout);
+        // printf(" not found!!!!\n");
         // freeGSTVAL(new);
         freeGSTVALalmost(new);
         return NULL;
@@ -254,8 +254,3 @@ freeGST(GST *g) {
     free(g);
     return;
 }
-
-// extern void
-// freeGST(GST *g) {
-//     return;
-// }

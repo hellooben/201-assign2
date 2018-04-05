@@ -1,9 +1,9 @@
-OBJS = integer.o real.o string.o sll.o dll.o stack.o queue.o heap.o a.out bst.o gst.o sll-*-*.o dll-*-*.o stack-*-*.o queue-*-*.o gst-*-*.o
+OBJS = integer.o real.o string.o sll.o dll.o stack.o queue.o heap.o a.out bst.o gst.o avl.o sll-*-*.o dll-*-*.o stack-*-*.o queue-*-*.o gst-*-*.o avl-*-*.o
 LOPTS = -Wall -Wextra -std=c99
 EXTRAS = integer.c real.c string.c sll.c dll.c stack.c queue.c
 OEXTRAS = integer.o real.o string.o sll.o dll.o stack.o queue.o
 
-all : test-sll test-dll test-stack test-queue test-bst
+all : test-sll test-dll test-stack test-queue test-bst test-gst test-avl
 
 test-sll :
 	gcc $(LOPTS) -c sll.c integer.c tests/sll-0-0.c
@@ -29,6 +29,10 @@ test-gst :
 	gcc $(LOPTS) -c gst.c bst.c $(EXTRAS) tests/submission0/gst-0-0.c
 	gcc $(LOPTS) gst-0-0.o $(OEXTRAS) bst.o gst.o -o test-gst
 
+test-avl :
+	gcc $(LOPTS) -c avl.c bst.c $(EXTRAS) tests/submission0/avl-0-0.c
+	gcc $(LOPTS) avl-0-0.o $(OEXTRAS) bst.o avl.o -o test-avl
+
 
 valgrind :
 	echo testing singly-linked list
@@ -49,6 +53,9 @@ valgrind :
 	echo testing gst
 	valgrind ./test-gst
 	echo
+	echo testing avl
+	valgrind ./test-avl
+	echo
 
 test :
 	./test-sll
@@ -57,6 +64,7 @@ test :
 	./test-queue
 	./test-bst
 	./test-gst
+	./test-avl
 
 clean :
-	rm -f $(OBJS) test-*.o bst-*-*.o test-bst test-sll test-dll test-stack test-queue test-gst
+	rm -f $(OBJS) test-*.o bst-*-*.o test-bst test-sll test-dll test-stack test-queue test-gst test-avl

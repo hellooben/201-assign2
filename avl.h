@@ -23,3 +23,51 @@ extern void displayAVLdebug(AVL *,FILE *);
 extern void freeAVL(AVL *);
 
 #endif
+/*
+function deleteFixup(x)
+        {
+        set the height of x to zero //since it will be deleted
+        loop
+            {
+            if (x is the root)
+                exit the loop
+            else if (parent favors x)                  //case 1
+                {
+                set the balance of parent
+                x = parent
+                //continue looping
+                }
+            else if (parent has no favorite)           //case 2
+                {
+                set the balance of parent
+                exit the loop
+                }
+            else
+                {
+                p = parent of x
+                z = the sibling of x
+                y = favorite of z
+                if (y exists and y,z,p are not linear) //case 3
+                    {
+                    rotate y to z
+                    rotate y to p
+                    set the balance of p
+                    set the balance of z
+                    set the balance of y
+                    x = y
+                    //continue looping
+                    }
+                else
+                    {
+                    rotate z to p                      //case 4
+                    set the balance of p
+                    set the balance of z
+                    if (y does not exist)
+                        exit the loop
+                    x = z
+                    //continue looping
+                    }
+                }
+            }
+        }
+*/
