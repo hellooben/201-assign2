@@ -187,27 +187,57 @@ insertBST(BST *t,void *value) {
         assert(returnable!=0);
         t->size ++;
         //enqueue(t->list, returnable);
+        // printf("BST INSRT returning this: ");
+        // t->display(getBSTNODEvalue(returnable), stdout);
+        // printf("\n");
         return returnable;
     }
 }
 
 BSTNODE *
 binaryInsert(BST *t, BSTNODE *node, BSTNODE *prev, void *value) {
+    // BSTNODE *new = newBSTNODE(value);
+    // printf("IN BINARY INSERT\n");
     if (node == NULL) {
-        // printf("NULL NODE, setting the parent\n");
         BSTNODE *new = newBSTNODE(value);
         new->parent = prev;
+        if (t->compare(prev->data, value) < 0) {
+            // printf("setting right\n");
+            prev->right = new;
+        }
+        else {
+            // printf("setting left\n");
+            prev->left = new;
+        }
+        // printf("NULL NODE, setting the parent\nreturning this: ");
+        // t->display(getBSTNODEvalue(new), stdout);
+        // printf("\n");
         return new;
     }
-    else if (t->compare(node->data, value) < 0) {
+    if (t->compare(node->data, value) < 0) {
         // printf("going right!\n");
-        node->right = binaryInsert(t, node->right, node, value);
+        return binaryInsert(t, node->right, node, value);
+        // node->right = binaryInsert(t, node->right, node, value);
+        // return node;
+        // return node->right;
     }
     else if (t->compare(node->data, value) > 0) {
         // printf("going left!\n");
-        node->left = binaryInsert(t, node->left, node, value);
+        return binaryInsert(t, node->left, node, value);
+        // node->left = binaryInsert(t, node->left, node, value);
+        // return node;
+        // return node->left;
     }
-    return node;
+    else {
+        // printf("returning outside\n");
+
+        return node;
+    }
+    // printf("returning outside\n");
+    // else {
+    //     printf("inside of the last else somehow\n");
+    //     return node;}
+
 }
 
 extern BSTNODE *
@@ -277,8 +307,8 @@ deleteBST(BST *t,void *value) {
     pruneLeafBST(t, current);
     t->size --;
     //printf("BST after ");
-    //t->display(current->data, stdout);
-    //printf(" was pruned: \n");
+    // t->display(current->data, stdout);
+    // printf(" was pruned: \n");
     //displayBSTdebug(t, stdout);
 
     return current;
@@ -291,8 +321,8 @@ swapToLeafBST(BST *t,BSTNODE *node) {
         return node;
     }
     else if (node->left == NULL && node->right == NULL) {
-        //t->display(node->data, stdout);
-        //printf(" was swapped to a leaf\n");
+        // t->display(node->data, stdout);
+        // printf(" was swapped to a leaf\n");
         return node;
     }
     else {
@@ -321,29 +351,35 @@ swapToLeafBST(BST *t,BSTNODE *node) {
                 node = node->right;
             }
         }
-        void *data = getBSTNODEvalue(temp);
-        setBSTNODEvalue(temp, getBSTNODEvalue(node));
-        setBSTNODEvalue(node, data);
+        if (t->swap) {
+            t->swap(temp, node);
+        }
+        else {
+            void *data = getBSTNODEvalue(temp);
+            setBSTNODEvalue(temp, getBSTNODEvalue(node));
+            setBSTNODEvalue(node, data);
+        }
         return swapToLeafBST(t, node);
     }
 }
 
 extern void
 pruneLeafBST(BST *t,BSTNODE *leaf) {
-    //printf("in prune\n");
-    if (leaf->left != NULL || leaf->right != NULL) {
-        //printf("this isnt a leaf. you fucked up\n");
+    // printf("in prune\n");
+    if (getBSTNODEleft(leaf) || getBSTNODEright(leaf)) {
+        // printf("this isnt a leaf. you fucked up\n");
         return;
     }
     else {
-        //printf("it's a leaf\n");
+        // printf("it's a leaf\n");
         if (leaf->parent == NULL) {
-            //printf("NULLED OUT ROOT\n");
+            // printf("NULLED OUT ROOT\n");
             t->root = NULL;
             return;
         }
-        //t->display(leaf->data, stdout);
-        //printf("'s parent isnt null\n");
+        // printf("hello\n");
+        // t->display(leaf->data, stdout);
+        // printf("'s parent isnt null\n");
         BSTNODE *par = getBSTNODEparent(leaf);
         //printf("got parent: ");
         //t->display(par->data, stdout);

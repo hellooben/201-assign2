@@ -24,6 +24,11 @@ extern void freeAVL(AVL *);
 
 #endif
 /*
+AVAL *temp = getBSTNODEvalue(node);
+temp->display(getAVAL(temp), stdout);
+printf("\n");
+
+
 function deleteFixup(x)
         {
         set the height of x to zero //since it will be deleted

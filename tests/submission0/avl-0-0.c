@@ -16,9 +16,12 @@ main(void)
     srandom(41);
     //simple INTEGER test of AVL
     AVL *p = newAVL(displayINTEGER,compareINTEGER,freeINTEGER);
+    // printf("MADE THE NEW AVL\n");
     insertAVL(p,newINTEGER(2));
+    // printf("inserted the first one\n");
     insertAVL(p,newINTEGER(3));
     insertAVL(p,newINTEGER(1));
+    // printf("INSERTED\n");
     statisticsAVL(p,stdout);
     printf("AVL:\n");
     displayAVL(p,stdout);
