@@ -194,7 +194,7 @@ void calculateHeights(BSTNODE *node) {
 }
 
 BSTNODE *findFavorite(BSTNODE *node) {
-    setBalance(node);
+    // setBalance(node);
     if (getBalance(getBSTNODEvalue(node)) >= 1) {
         return getBSTNODEleft(node);
     }
@@ -216,7 +216,7 @@ BSTNODE *getSibling(BSTNODE *node) {
         return getBSTNODEleft(parent);
     }
     else {
-        return node;
+        return NULL;
     }
 }
 
@@ -290,33 +290,13 @@ insertAVL(AVL *a,void *value) {
     }
     else {
         printf("not in the tree\n");
-        BSTNODE *fix = insertBST(a->bstree, new);
-        BSTNODE *node = fix;
+        BSTNODE *node = insertBST(a->bstree, new);
+        a->size ++;
         printf("AFTER INSERT|AVL LOOKS LIKE :\n");
         displayAVL(a, stdout);
         printf("\n");
 
-        a->size ++;
-        int b = 0;
-        while (node != NULL) {
-            calculateHeights(node);
-            b = getBalance(getBSTNODEvalue(node));
-            if (b > 1 || b < -1) {
-                printf("balance of ");
-                a->display(getAVAL(getBSTNODEvalue(node)), stdout);
-                printf(" is %d. Fixing....\n", b);
-                // b = getBalance(getBSTNODEvalue(node));
-                while (b > 1 || b < -1) {
-                    insertionFixup(a->bstree, fix);
-                    b = getBalance(getBSTNODEvalue(node));
-                }
-                printf("AVL after fixup: \n");
-                displayAVL(a, stdout);
-                printf("\n");
-            }
-            node = getBSTNODEparent(node);
-        }
-        
+        insertionFixup(a->bstree, node);
     }
     printf("\nDONE INSERTING");
     printf("|AVL LOOKS LIKE :\n");
@@ -341,7 +321,7 @@ void insertionFixup(BST *t, BSTNODE *node) {
             setBalance(node);
             break;
         }
-        else if (findFavorite(parent) == sibling) { //case 1
+        else if (findFavorite(parent) != NULL && findFavorite(parent) == sibling) { //case 1
             printf("parent's favorite is the sibling, case 1\n");
             setBalance(parent);
             break;
@@ -408,71 +388,80 @@ void rotate(BST *t, BSTNODE *src, BSTNODE *dst) {
     }
 }
 
-void leftRotate(BST *t, BSTNODE *src, BSTNODE *dst) {
+void leftRotate(BST *t, BSTNODE *y, BSTNODE *x) {
     printf("left rotating!\n");
-    AVAL *t1 = getBSTNODEvalue(src);
-    AVAL *t2 = getBSTNODEvalue(dst);
+    AVAL *t1 = getBSTNODEvalue(y);
+    AVAL *t2 = getBSTNODEvalue(x);
     t1->display(getAVAL(t1), stdout);
     printf(" and ");
     t1->display(getAVAL(t2), stdout);
     printf("\n");
 
-    BSTNODE *srcLeft = getBSTNODEleft(src);
-    BSTNODE *dstParent = getBSTNODEparent(dst);
-    setBSTNODEright(dst, srcLeft);
-    if (srcLeft != NULL) {
-        setBSTNODEparent(srcLeft, dst);
+    BSTNODE *yLeft = getBSTNODEleft(y);
+    BSTNODE *xParent = getBSTNODEparent(x);
+
+    setBSTNODEright(x, yLeft);
+
+    if (yLeft != NULL) {
+        setBSTNODEparent(yLeft, x);
     }
-    setBSTNODEparent(src, dstParent);
-    if (dstParent == NULL) {
-        setBSTroot(t, src);
+
+    setBSTNODEparent(y, xParent);
+
+    if (xParent == NULL) {
+        setBSTroot(t, y);
     }
-    else if (testLeft(dst, dstParent) == 1) {
-        setBSTNODEleft(dstParent, src);
+    else if (testLeft(x, xParent) == 1) {
+        setBSTNODEleft(xParent, y);
     }
     else {
-        setBSTNODEright(dstParent, src);
+        setBSTNODEright(xParent, y);
     }
-    setBSTNODEleft(src, dst);
-    setBSTNODEparent(dst, src);
-    calculateHeights(dst);
-    calculateHeights(src);
-    // setBalance(src);
-    // setBalance(dst);
+
+    setBSTNODEleft(y, x);
+    setBSTNODEparent(x, y);
+
+    calculateHeights(x);
+    calculateHeights(y);
     return;
 }
 
-void rightRotate(BST *t, BSTNODE *src, BSTNODE *dst) {
+void rightRotate(BST *t, BSTNODE *y, BSTNODE *x) {
     printf("right rotating!\n");
-    AVAL *t1 = getBSTNODEvalue(src);
-    AVAL *t2 = getBSTNODEvalue(dst);
+    AVAL *t1 = getBSTNODEvalue(y);
+    AVAL *t2 = getBSTNODEvalue(x);
     t1->display(getAVAL(t1), stdout);
     printf(" and ");
     t1->display(getAVAL(t2), stdout);
     printf("\n");
 
-    BSTNODE *srcRight = getBSTNODEright(src);
-    BSTNODE *dstParent = getBSTNODEparent(dst);
-    setBSTNODEleft(dst, srcRight);
-    if (srcRight != NULL) {
-        setBSTNODEparent(srcRight, dst);
+    BSTNODE *yRight = getBSTNODEright(y);
+    BSTNODE *xParent = getBSTNODEparent(x);
+
+    setBSTNODEleft(x, yRight);
+
+    if (yRight != NULL) {
+        setBSTNODEparent(yRight, x);
     }
-    setBSTNODEparent(src, dstParent);
-    if (dstParent == NULL) {
-        setBSTroot(t, src);
+
+    setBSTNODEparent(y, xParent);
+
+    if (xParent == NULL) {
+        setBSTroot(t, y);
     }
-    else if (testLeft(dst, dstParent) == 0) {
-        setBSTNODEright(dstParent, src);
+    else if (testLeft(x, xParent) == 0) {
+        setBSTNODEright(xParent, y);
     }
     else {
-        setBSTNODEleft(dstParent, src);
+        setBSTNODEleft(xParent, y);
     }
-    setBSTNODEright(src, dst);
-    setBSTNODEparent(dst, src);
-    calculateHeights(dst);
-    calculateHeights(src);
-    // setBalance(src);
-    // setBalance(dst);
+
+    setBSTNODEright(y, x);
+    setBSTNODEparent(x, y);
+
+    calculateHeights(x);
+    calculateHeights(y);
+
     return;
 }
 
