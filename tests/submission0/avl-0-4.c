@@ -43,6 +43,9 @@ main(void)
         int j = random() % 10;
         INTEGER *a = newINTEGER(j);
         int count = findAVLcount(p,a);
+        printf("TRYING TO DELETE : ");
+        displayINTEGER(a, stdout);
+        printf("\n");
         if (count == 1)
             freeINTEGER(deleteAVL(p,a));
         else if (count > 1)
