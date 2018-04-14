@@ -203,14 +203,18 @@ void processCommandsAVL(AVL *tree, char *temp, FILE *fp) {
         case 105: //insert
             str = stringPending(fp);
             temp = processString(str, fp);
-            STRING *insert = newSTRING(temp);
-            insertAVL(tree, insert);
+            processInsertAVL(temp, tree);
             break;
         case 100: //deleteAVL
             str = stringPending(fp);
             temp = processString(str, fp);
             STRING *delete = newSTRING(temp);
-            deleteAVL(tree, delete);
+            void *del = deleteAVL(tree, delete);
+            if (del == NULL) {
+                printf("Value ");
+                displaySTRING(delete, stdout);
+                printf("not found.\n");
+            }
             break;
         case 102: //frequency
             str = stringPending(fp);
@@ -244,8 +248,7 @@ void processCommandsGST(GST *tree, char *temp, FILE *fp) {
         case 105: //insert
             str = stringPending(fp);
             temp = processString(str, fp);
-            STRING *insert = newSTRING(temp);
-            insertGST(tree, insert);
+            processInsertGST(temp, tree);
             break;
         case 100: //deleteAVL
             // printf("delete\n");
@@ -254,7 +257,12 @@ void processCommandsGST(GST *tree, char *temp, FILE *fp) {
             temp = processString(str, fp);
             // printf("TEMP after cleaning: %s\n", temp);
             STRING *delete = newSTRING(temp);
-            deleteGST(tree, delete);
+            void *del = deleteGST(tree, delete);
+            if (del == NULL && isalpha(temp[0]) == 1) {
+                printf("Value ");
+                displaySTRING(delete, stdout);
+                printf(" not found.\n");
+            }
             break;
         case 102: //frequency
             str = stringPending(fp);
