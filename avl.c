@@ -21,7 +21,7 @@ AVAL *newAVAL(void*v,
 void (*d)(void *,FILE *),           //display
 int (*c)(void *,void *),           //comparator
 void (*f)(void *));
-void aDisplay(void *,FILE *);
+void adisplay(void *,FILE *);
 int compareAVAL(void *,void *);
 void swapper(BSTNODE *,BSTNODE *);
 void freeAVAL(void *);
@@ -46,7 +46,7 @@ void leftRotate(BST *,BSTNODE *,BSTNODE *);
 void rightRotate(BST *,BSTNODE *,BSTNODE *);
 
 
-void aDisplay(void *val, FILE *fp) {
+void adisplay(void *val, FILE *fp) {
     AVAL *temp = val;
     temp->display(getAVAL(temp), fp);
     // printf("{%d}", getHeight(temp));
@@ -59,6 +59,7 @@ void aDisplay(void *val, FILE *fp) {
     if (getBalance(temp) < 0) {
         fprintf(fp, "-");
     }
+    return;
 }
 
 int compareAVAL(void *v1, void *v2) {
@@ -279,7 +280,7 @@ int (*c)(void *,void *),            //comparator
 void (*f)(void *)) {                //free
     AVL *tree = malloc(sizeof(AVL));
     tree->size = 0;
-    tree->bstree = newBST(aDisplay, compareAVAL, swapper, freeAVAL);
+    tree->bstree = newBST(adisplay, compareAVAL, swapper, freeAVAL);
     tree->display = d;
     tree->compare = c;
     tree->free = f;
@@ -570,7 +571,7 @@ void deleteFixup(BST *t, BSTNODE *node) {
                 // printf("case 4\n");
                 // printf("before rotating, tree looks like: \n");
                 // displayBSTdecorated(t, stdout);
-                printf("\n");
+                // printf("\n");
                 rotate(t, sibling, parent);
                 setBalance(parent);
                 setBalance(sibling);
@@ -640,12 +641,18 @@ statisticsAVL(AVL *a,FILE *fp) {
 
 extern void
 displayAVL(AVL *a,FILE *fp) {
+    if (getBSTroot(a->bstree) == NULL) {
+        return;
+    }
     displayBSTdecorated(a->bstree, fp);
     return;
 }
 
 extern void
 displayAVLdebug(AVL *a,FILE *fp) {
+    if (getBSTroot(a->bstree) == NULL) {
+        return;
+    }
     displayBST(a->bstree, fp);
     return;
 }

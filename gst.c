@@ -37,15 +37,15 @@ void displayGSTVAL(void *,FILE *);
 int compareGSTVAL(void *, void *);
 void freeGSTVAL(void *);
 void freeGSTVALalmost(GSTVAL *);
-void updateFREQ(GSTVAL *,int);
-int getFREQ(GSTVAL *);
+void updateFreqGST(GSTVAL *,int);
+int getFreqGST(GSTVAL *);
 void *getGSTVAL(GSTVAL *);
 
 void displayGSTVAL(void *val, FILE *fp) {
     GSTVAL *temp = val;
     temp->display(getGSTVAL(temp),fp);
-    if (getFREQ(val) > 1) {
-        fprintf(fp, "[%d]", getFREQ(temp));
+    if (getFreqGST(val) > 1) {
+        fprintf(fp, "[%d]", getFreqGST(temp));
     }
     return;
 }
@@ -70,12 +70,12 @@ void freeGSTVALalmost(GSTVAL *val) {
     return;
 }
 
-void updateFREQ(GSTVAL *val, int num) {
+void updateFreqGST(GSTVAL *val, int num) {
     val->freq += num;
     return;
 }
 
-int getFREQ(GSTVAL *val) {
+int getFreqGST(GSTVAL *val) {
     if (val != NULL) {
         return val->freq;
     }
@@ -125,7 +125,7 @@ insertGST(GST *g,void *value) {
     // printf("result of findBST awaits!!!!!!!:\n");
     if (temp != NULL) {
         // printf("found it!\n");
-        updateFREQ(getBSTNODEvalue(temp),1);
+        updateFreqGST(getBSTNODEvalue(temp),1);
         g->size ++;
         freeGSTVALalmost(new);
     }
@@ -146,7 +146,7 @@ findGSTcount(GST *g,void *value) {
     if (temp != NULL) {
         // freeGSTVAL(new);
         freeGSTVALalmost(new);
-        return getFREQ(getBSTNODEvalue(temp));
+        return getFreqGST(getBSTNODEvalue(temp));
     }
     else {
         // freeGSTVAL(new);
@@ -183,8 +183,8 @@ deleteGST(GST *g,void *value) {
         // printf("found\n");
         // void *returnable = getGSTVAL(getBSTNODEvalue(temp));
         void *returnable = getGSTVAL(getBSTNODEvalue(temp));
-        if (getFREQ(getBSTNODEvalue(temp)) > 1) {
-            updateFREQ(getBSTNODEvalue(temp), -1);
+        if (getFreqGST(getBSTNODEvalue(temp)) > 1) {
+            updateFreqGST(getBSTNODEvalue(temp), -1);
             g->size --;
             // freeGSTVAL(new);
             // printf("RETURNING: \n");

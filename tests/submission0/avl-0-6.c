@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "integer.h"
 #include "../../integer.h"
 #include "../../real.h"
 #include "../../string.h"
