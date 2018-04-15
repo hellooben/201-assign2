@@ -158,6 +158,7 @@ setBSTroot(BST *t,BSTNODE *replacement) {
         //replacement->right = curr->right;
         //replacement->left = curr->left;
         //replacement->parent = NULL;
+    setBSTNODEparent(replacement, NULL);
     return;
 }
 
@@ -175,6 +176,7 @@ insertBST(BST *t,void *value) {
         BSTNODE *new = newBSTNODE(value);
         assert(new!=0);
         t->root = new;
+        setBSTNODEparent(t->root, NULL);
         t->size ++;
         //enqueue(t->list, new);
         return new;
@@ -417,8 +419,10 @@ statisticsBST(BST *t,FILE *fp) {
         return;
     }
     else {
+        // printf("gonna find the min and max\n");
         int min = BSTminimum(t->root);
         int max = BSTmaximum(t->root);
+        // printf("found the min and max\n");
         fprintf(fp, "Nodes: %d\nMinimum depth: %d\nMaximum depth: %d\n", sizeBST(t), min, max);
 
         return;
@@ -670,7 +674,6 @@ displayRecursive(BST *t, BSTNODE *root, FILE *fp) {
     if (root->right != NULL) {
         printf(" ");
         displayRecursive(t, root->right, fp);
-
     }
     printf("]");
 }

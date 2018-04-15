@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../integer.h"
-#include "../../real.h"
-#include "../../string.h"
-#include "../../queue.h"
-#include "../../bst.h"
-#include "../../avl.h"
+#include "integer.h"
+#include "real.h"
+#include "string.h"
+#include "queue.h"
+#include "bst.h"
+#include "avl.h"
 
 void srandom(unsigned int);
 long int random(void);
@@ -13,7 +13,7 @@ long int random(void);
 int
 main(void)
     {
-    srandom(46);
+    srandom(106);
     //INTEGER test of AVL, nominal size is 189
     int i;
     AVL *p = newAVL(displayINTEGER,compareINTEGER,freeINTEGER);

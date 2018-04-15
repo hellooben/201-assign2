@@ -323,7 +323,7 @@ void insertionFixup(BST *t, BSTNODE *node) {
         BSTNODE *fav = findFavorite(node);
         BSTNODE *sibling = getSibling(node);
 
-        if (parent == NULL) {
+        if (getBSTroot(t) == node) {
             // printf("parent is null\n");
             setBalance(node);
             break;
@@ -418,6 +418,7 @@ void leftRotate(BST *t, BSTNODE *y, BSTNODE *x) {
 
     if (xParent == NULL) {
         setBSTroot(t, y);
+        setBSTNODEparent(y, NULL);
     }
     else if (testLeft(x, xParent) == 1) {
         setBSTNODEleft(xParent, y);
@@ -458,6 +459,7 @@ void rightRotate(BST *t, BSTNODE *y, BSTNODE *x) {
 
     if (xParent == NULL) {
         setBSTroot(t, y);
+        setBSTNODEparent(y, NULL);
     }
     else if (testLeft(x, xParent) == 0) {
         setBSTNODEright(xParent, y);
