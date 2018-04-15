@@ -10,7 +10,8 @@
 
 
 char *processString(int, FILE *);
-char *cleanString(char *);
+void cleanString(char *);
+void cleanToken(char *);
 void processInsertGST(char *, GST *);
 void processInsertAVL(char *, AVL *);
 void processCommandsAVL(AVL *, char *, FILE *fp);
@@ -85,7 +86,7 @@ int main (int argc, char **argv) {
 
             temp = processString(str, data);
             // if (temp) {
-            //     printf("TEMP after cleaning: %s\n", temp);
+            // printf("TEMP after cleaning: %s\n", temp);
             // }
             processInsertGST(temp, gst);
             str = stringPending(data);
@@ -150,51 +151,69 @@ char *processString(int x, FILE *fp) {
     if (x == 0) {
         // printf("not a double quote\n");
         str = readToken(fp);
-        str = cleanString(str);
+        cleanToken(str);
         return str;
     }
     else {
         // printf("double quote\n");
         str = readString(fp);
-        str = cleanString(str);
+        cleanString(str);
         return str;
     }
 }
 
-char * cleanString(char *str) {
-    char *returnable = str;
-
-
-    int size = sizeof(str)/sizeof(char *);
+void cleanToken(char *str) {
+    // int size = sizeof(str)/sizeof(char *);
+    int size = strlen(str);
     int pos = 0;
     // printf("STR SIZE : %d\nSTRING: %s\n", size, str);
-    // if (str[0] < 32) {
-    //     printf("RETURNING NULL\n");
-    //     return NULL;
-    // }
-
-    for (int i=0; i<(size); i++) {
-        if (str[i] >= 97 && str[i] <= 122) {
-            // printf("lowercase\n");
-            returnable[pos] = str[i];
+    for (int i=0; i<size; i++) {
+        if (isalpha(str[i])) {
+            if (isupper(str[i])) {
+                str[pos] = str[i] + 32;
+            }
+            else {
+                str[pos] = str[i];
+            }
             pos ++;
         }
-        else if (str[i] >= 65 && str[i] <= 90) {
-            // printf("uppercase\n");
-            returnable[pos] = str[i] + 32;
-            pos ++;
-        }
-        else if (str[i] == 32) {
-            // printf("space\n");
-            returnable[pos] = str[i];
-            pos ++;
-        }
-        else if (isalpha(str[i]) == 0) {
-            // printf("not alphabetical\n");
-            continue;
-        }
+        else continue;
     }
-    return returnable;
+    str[pos] = '\0';
+    return;
+}
+
+void cleanString(char *str) {
+    // int size = sizeof(str)/sizeof(char *);
+    int size = strlen(str);
+    int pos = 0;
+    int space = 0;
+    // printf("STR SIZE : %d\nSTRING: %s\n", size, str);
+    for (int i=0; i<size; i++) {
+        if (str[i] == 32) {
+            if (space != 0) {
+                space = 1;
+                str[pos] = str[i];
+                pos ++;
+            }
+            else {
+                continue;
+            }
+        }
+        else if (isalpha(str[i])) {
+            if (isupper(str[i])) {
+                str[pos] = str[i] + 32;
+            }
+            else {
+                str[pos] = str[i];
+            }
+            pos ++;
+        }
+        else continue;
+
+    }
+    str[pos] = '\0';
+    return;
 }
 
 void processCommandsAVL(AVL *tree, char *temp, FILE *fp) {
@@ -210,10 +229,10 @@ void processCommandsAVL(AVL *tree, char *temp, FILE *fp) {
             temp = processString(str, fp);
             STRING *delete = newSTRING(temp);
             void *del = deleteAVL(tree, delete);
-            if (del == NULL) {
+            if (del == NULL && isalpha(temp[0]) == 1) {
                 printf("Value ");
                 displaySTRING(delete, stdout);
-                printf("not found.\n");
+                printf(" not found.\n");
             }
             break;
         case 102: //frequency
@@ -226,14 +245,13 @@ void processCommandsAVL(AVL *tree, char *temp, FILE *fp) {
             printf(" is %d\n", count);
             break;
         case 115: //show
-        if (sizeAVL(tree) == 0) {
-            printf("EMPTY\n");
+            if (sizeAVL(tree) > 0) {
+                displayAVL(tree, stdout);
+            }
+            else {
+                printf("EMPTY\n");
+            }
             break;
-        }
-        else {
-            displayAVL(tree, stdout);
-            break;
-        }
         case 114: //statistics
             statisticsAVL(tree, stdout);
             break;
@@ -274,14 +292,13 @@ void processCommandsGST(GST *tree, char *temp, FILE *fp) {
             printf(" is %d\n", count);
             break;
         case 115: //show
-            if (sizeGST(tree) == 0) {
-                printf("EMPTY\n");
-                break;
+            if (sizeGST(tree) > 0) {
+                displayGST(tree, stdout);
             }
             else {
-                displayGST(tree, stdout);
-                break;
+                printf("EMPTY\n");
             }
+            break;
         case 114: //statistics
             statisticsGST(tree, stdout);
             break;

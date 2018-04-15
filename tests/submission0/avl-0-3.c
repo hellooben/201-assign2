@@ -29,6 +29,7 @@ main(void)
             freeINTEGER(a);
             }
         }
+        printf("here\n");
     if (sizeAVL(p) < 200)
         {
         printf("AVL:\n");

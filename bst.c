@@ -84,12 +84,13 @@ setBSTNODEright(BSTNODE *n,BSTNODE *replacement) {
 
 extern BSTNODE *
 getBSTNODEparent(BSTNODE *n) {
-    if (n->parent != NULL) {
-        return n->parent;
-    }
-    else {
-        return NULL;
-    }
+    // if (n->parent != NULL) {
+    //     return n->parent;
+    // }
+    // else {
+    //     return NULL;
+    // }
+    return n->parent;
 }
 
 extern void
@@ -155,10 +156,6 @@ getBSTroot(BST *t) {
 extern void
 setBSTroot(BST *t,BSTNODE *replacement) {
     t->root = replacement;
-        //replacement->right = curr->right;
-        //replacement->left = curr->left;
-        //replacement->parent = NULL;
-    setBSTNODEparent(replacement, NULL);
     return;
 }
 
@@ -176,7 +173,7 @@ insertBST(BST *t,void *value) {
         BSTNODE *new = newBSTNODE(value);
         assert(new!=0);
         t->root = new;
-        setBSTNODEparent(t->root, NULL);
+        setBSTNODEparent(t->root, new);
         t->size ++;
         //enqueue(t->list, new);
         return new;
@@ -374,7 +371,7 @@ pruneLeafBST(BST *t,BSTNODE *leaf) {
     }
     else {
         // printf("it's a leaf\n");
-        if (leaf->parent == NULL) {
+        if (leaf->parent == leaf) {
             // printf("NULLED OUT ROOT\n");
             t->root = NULL;
             return;
@@ -552,7 +549,7 @@ levelOrderDecorated(BST *t, BSTNODE *node, FILE *fp, QUEUE *newq, QUEUE *oldq) {
     fprintf(fp, "%d: ", lines);
     t->display(node->data, fp);
     fprintf(fp, "(");
-    t->display(node->data, fp);
+    t->display(getBSTNODEparent(node)->data, fp);
     fprintf(fp, ")");
     fprintf(fp, "X");
     fprintf(fp, "\n");
