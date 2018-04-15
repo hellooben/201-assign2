@@ -490,7 +490,7 @@ deleteAVL(AVL *a,void *value) {
             updateFREQ(getBSTNODEvalue(temp), -1);
             a->size --;
             freeAVALalmost(new);
-            return returnable;
+            return NULL;
         }
         else {
             // printf("has freq 1\n");
@@ -646,9 +646,12 @@ statisticsAVL(AVL *a,FILE *fp) {
 extern void
 displayAVL(AVL *a,FILE *fp) {
     if (getBSTroot(a->bstree) == NULL) {
+        fprintf(fp, "EMPTY\n");
         return;
     }
-    displayBSTdecorated(a->bstree, fp);
+    else {
+        displayBSTdecorated(a->bstree, fp);
+    }
     return;
 }
 

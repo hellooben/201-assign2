@@ -30,8 +30,8 @@ test-gst :
 	gcc $(LOPTS) gst-0-0.o $(OEXTRAS) bst.o gst.o -o test-gst
 
 test-avl :
-	gcc $(LOPTS) -c avl.c bst.c $(EXTRAS) tests/submission0/avl-0-3.c
-	gcc $(LOPTS) avl-0-3.o $(OEXTRAS) bst.o avl.o -o test-avl
+	gcc $(LOPTS) -c avl.c bst.c $(EXTRAS) avl-0-0.c
+	gcc $(LOPTS) avl-0-0.o $(OEXTRAS) bst.o avl.o -o test-avl
 
 trees :
 	gcc $(LOPTS) -c trees.c avl.c gst.c bst.c scanner.c $(EXTRAS)

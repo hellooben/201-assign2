@@ -81,13 +81,7 @@ int main (int argc, char **argv) {
 
         str = stringPending(data);
         while (!feof(data)) {
-            // STRING *new = newSTRING(temp);
-            // insertGST(gst, new);
-
             temp = processString(str, data);
-            // if (temp) {
-            // printf("TEMP after cleaning: %s\n", temp);
-            // }
             processInsertGST(temp, gst);
             str = stringPending(data);
         }
@@ -99,18 +93,18 @@ int main (int argc, char **argv) {
         str = stringPending(commands);
         temp = processString(str, commands);
         // printf("TEMP after cleaning: %s\n", temp);
-        if (temp [0] != 32) {
+        // if (temp [0] != 32) {
             // printf("going to process commands\n");
-            processCommandsGST(gst, temp, commands);
-        }
+        processCommandsGST(gst, temp, commands);
+        // }
 
         str = stringPending(commands);
         while (!feof(commands)) {
             temp = processString(str, commands);
-            if (temp [0] != 32) {
+            // if (temp [0] != 32) {
                 // printf("going to process commands\n");
-                processCommandsGST(gst, temp, commands);
-            }
+            processCommandsGST(gst, temp, commands);
+            // }
             str = stringPending(commands);
         }
     }
@@ -121,7 +115,7 @@ int main (int argc, char **argv) {
 /********************************************/
 
 void processInsertGST(char *str, GST *tree) {
-    if (isalpha(str[0]) == 1) {
+    if (isalpha(str[0])) {
         // printf("inserting %s\n\n", str);
         STRING *new = newSTRING(str);
         insertGST(tree, new);
@@ -134,7 +128,7 @@ void processInsertGST(char *str, GST *tree) {
 }
 
 void processInsertAVL(char *str, AVL *tree) {
-    if (isalpha(str[0]) == 1) {
+    if (isalpha(str[0])) {
         // printf("inserting %s\n\n", str);
         STRING *new = newSTRING(str);
         insertAVL(tree, new);
@@ -166,7 +160,7 @@ void cleanToken(char *str) {
     // int size = sizeof(str)/sizeof(char *);
     int size = strlen(str);
     int pos = 0;
-    // printf("STR SIZE : %d\nSTRING: %s\n", size, str);
+    // printf("TOKEN SIZE : %d\nTOKEN: .%s.\n", size, str);
     for (int i=0; i<size; i++) {
         if (isalpha(str[i])) {
             if (isupper(str[i])) {
@@ -180,6 +174,7 @@ void cleanToken(char *str) {
         else continue;
     }
     str[pos] = '\0';
+    // printf("TOKEN AFTER CLEANING: .%s.\n", str);
     return;
 }
 
@@ -188,17 +183,18 @@ void cleanString(char *str) {
     int size = strlen(str);
     int pos = 0;
     int space = 0;
-    // printf("STR SIZE : %d\nSTRING: %s\n", size, str);
+    // printf("STR SIZE : %d\nSTRING: .%s.\n", size, str);
     for (int i=0; i<size; i++) {
         if (str[i] == 32) {
             if (space != 0) {
-                space = 1;
+                // if (str[i+1] != 32 && i != size-1) {
+                // if (isalpha(str[i+1]) && i != size -1) {
+                space = 0;
                 str[pos] = str[i];
                 pos ++;
+                // }
             }
-            else {
-                continue;
-            }
+            else continue;
         }
         else if (isalpha(str[i])) {
             if (isupper(str[i])) {
@@ -207,54 +203,63 @@ void cleanString(char *str) {
             else {
                 str[pos] = str[i];
             }
+            space = 1;
             pos ++;
         }
         else continue;
-
     }
-    str[pos] = '\0';
+
+    if (isspace(str[pos-1])) {
+        str[pos-1] = '\0';
+    }
+    else {
+        str[pos] = '\0';
+    }
+
+
+    // printf("POS: %d, STRING AFTER CLEANING: .%s.\n", pos, str);
     return;
 }
 
 void processCommandsAVL(AVL *tree, char *temp, FILE *fp) {
     int str = 0;
-    switch (temp[0]) {
-        case 105: //insert
-            str = stringPending(fp);
-            temp = processString(str, fp);
-            processInsertAVL(temp, tree);
-            break;
-        case 100: //deleteAVL
-            str = stringPending(fp);
-            temp = processString(str, fp);
-            STRING *delete = newSTRING(temp);
-            void *del = deleteAVL(tree, delete);
-            if (del == NULL && isalpha(temp[0]) == 1) {
-                printf("Value ");
-                displaySTRING(delete, stdout);
-                printf(" not found.\n");
-            }
-            break;
-        case 102: //frequency
-            str = stringPending(fp);
-            temp = processString(str, fp);
-            STRING *freq = newSTRING(temp);
-            int count = findAVLcount(tree, freq);
-            printf("Frequency of ");
-            displaySTRING(freq, stdout);
-            printf(" is %d\n", count);
-            break;
-        case 115: //show
-            if (sizeAVL(tree) > 0) {
-                displayAVL(tree, stdout);
-            }
-            else {
-                printf("EMPTY\n");
-            }
-            break;
-        case 114: //statistics
-            statisticsAVL(tree, stdout);
-            break;
+    int num = temp[0];
+
+    if (num == 105) {
+        str = stringPending(fp);
+        temp = processString(str, fp);
+        processInsertAVL(temp, tree);
+    }
+    else if (num == 100) {
+        str = stringPending(fp);
+        // printf("result of pending: %d\n", str);
+        temp = processString(str, fp);
+        // printf("TEMP after cleaning: %s\n", temp);
+        STRING *delete = newSTRING(temp);
+        void *del = findAVL(tree, delete);
+        if (del == NULL && isalpha(temp[0])) {
+            printf("Value ");
+            displaySTRING(delete, stdout);
+            printf(" not found.\n");
+        }
+        else {
+            del = deleteAVL(tree, delete);
+        }
+    }
+    else if (num == 102) {
+        str = stringPending(fp);
+        temp = processString(str, fp);
+        STRING *freq = newSTRING(temp);
+        int count = findAVLcount(tree, freq);
+        printf("Frequency of ");
+        displaySTRING(freq, stdout);
+        printf(": %d\n", count);
+    }
+    else if (num == 115) {
+        displayAVL(tree, stdout);
+    }
+    else if (num == 114) {
+        statisticsAVL(tree, stdout);
     }
     return;
 }
@@ -262,46 +267,43 @@ void processCommandsAVL(AVL *tree, char *temp, FILE *fp) {
 void processCommandsGST(GST *tree, char *temp, FILE *fp) {
     // printf("PROCESSING COMMANDS GST with %s\n", temp);
     int str = 0;
-    switch (temp[0]) {
-        case 105: //insert
-            str = stringPending(fp);
-            temp = processString(str, fp);
-            processInsertGST(temp, tree);
-            break;
-        case 100: //deleteAVL
-            // printf("delete\n");
-            str = stringPending(fp);
-            // printf("result of pending: %d\n", str);
-            temp = processString(str, fp);
-            // printf("TEMP after cleaning: %s\n", temp);
-            STRING *delete = newSTRING(temp);
-            void *del = deleteGST(tree, delete);
-            if (del == NULL && isalpha(temp[0]) == 1) {
-                printf("Value ");
-                displaySTRING(delete, stdout);
-                printf(" not found.\n");
-            }
-            break;
-        case 102: //frequency
-            str = stringPending(fp);
-            temp = processString(str, fp);
-            STRING *freq = newSTRING(temp);
-            int count = findGSTcount(tree, freq);
-            printf("Frequency of ");
-            displaySTRING(freq, stdout);
-            printf(" is %d\n", count);
-            break;
-        case 115: //show
-            if (sizeGST(tree) > 0) {
-                displayGST(tree, stdout);
-            }
-            else {
-                printf("EMPTY\n");
-            }
-            break;
-        case 114: //statistics
-            statisticsGST(tree, stdout);
-            break;
+    int num = temp[0];
+
+    if (num == 105) {
+        str = stringPending(fp);
+        temp = processString(str, fp);
+        processInsertGST(temp, tree);
+    }
+    else if (num == 100) {
+        str = stringPending(fp);
+        // printf("result of pending: %d\n", str);
+        temp = processString(str, fp);
+        // printf("TEMP after cleaning: %s\n", temp);
+        STRING *delete = newSTRING(temp);
+        void *del = findGST(tree, delete);
+        if (del == NULL && isalpha(temp[0])) {
+            printf("Value ");
+            displaySTRING(delete, stdout);
+            printf(" not found.\n");
+        }
+        else {
+            del = deleteGST(tree, delete);
+        }
+    }
+    else if (num == 102) {
+        str = stringPending(fp);
+        temp = processString(str, fp);
+        STRING *freq = newSTRING(temp);
+        int count = findGSTcount(tree, freq);
+        printf("Frequency of ");
+        displaySTRING(freq, stdout);
+        printf(": %d\n", count);
+    }
+    else if (num == 115) {
+        displayGST(tree, stdout);
+    }
+    else if (num == 114) {
+        statisticsGST(tree, stdout);
     }
     return;
 }

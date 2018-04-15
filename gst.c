@@ -221,12 +221,12 @@ deleteGST(GST *g,void *value) {
 
 extern int
 sizeGST(GST *g) {
-    return g->size;
+    return sizeBST(g->bstree);
 }
 
 extern int
 duplicates(GST *g) {
-    return sizeGST(g) - sizeBST(g->bstree);
+    return g->size - sizeBST(g->bstree);
 }
 
 extern void
@@ -238,7 +238,12 @@ statisticsGST(GST *g,FILE *fp) {
 
 extern void
 displayGST(GST *g,FILE *fp) {
-    displayBSTdecorated(g->bstree, fp);
+    if (getBSTroot(g->bstree) == NULL) {
+        fprintf(fp, "EMPTY\n");
+    }
+    else {
+        displayBSTdecorated(g->bstree, fp);
+    }
     return;
 }
 
