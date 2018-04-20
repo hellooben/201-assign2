@@ -11,7 +11,6 @@ typedef struct gstval
     int freq;
     void (*display)(void *,FILE *);          //display
     int (*compare)(void *,void *);           //comparator
-    // void (*swap)(BSTNODE *,BSTNODE *);     //swapper
     void (*free)(void *);                  //free
 } GSTVAL;
 
@@ -98,7 +97,6 @@ struct gst
     BST *bstree;
     void (*display)(void *,FILE *);          //display
     int (*compare)(void *,void *);           //comparator
-    // void (*swap)(BSTNODE *,BSTNODE *);     //swapper
     void (*free)(void *);                  //free
 };
 
@@ -119,23 +117,17 @@ void (*f)(void *)) {                 //free
 
 extern void
 insertGST(GST *g,void *value) {
-    // printf("IN INSERTGST\n");
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
-    // printf("result of findBST awaits!!!!!!!:\n");
     if (temp != NULL) {
-        // printf("found it!\n");
         updateFreqGST(getBSTNODEvalue(temp),1);
         g->size ++;
         freeGSTVALalmost(new);
     }
     else {
-        // printf("didnt find it!\n");
-        // printf("Made the new GSTVAL!\n");
         insertBST(g->bstree, new);
         g->size ++;
     }
-    // freeGSTVALalmost(new);
     return;
 }
 
@@ -144,12 +136,10 @@ findGSTcount(GST *g,void *value) {
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
-        // freeGSTVAL(new);
         freeGSTVALalmost(new);
         return getFreqGST(getBSTNODEvalue(temp));
     }
     else {
-        // freeGSTVAL(new);
         freeGSTVALalmost(new);
         return 0;
     }
@@ -161,15 +151,10 @@ findGST(GST *g,void *value) {
     BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
         void *returnable = getGSTVAL(getBSTNODEvalue(temp));
-        // freeGSTVAL(new);
         freeGSTVALalmost(new);
         return returnable;
     }
     else {
-        // printf("Value ");
-        // g->display(value, stdout);
-        // printf(" not found\n");
-        // freeGSTVAL(new);
         freeGSTVALalmost(new);
         return NULL;
     }
@@ -180,40 +165,24 @@ deleteGST(GST *g,void *value) {
     GSTVAL *new = newGSTVAL(value, g->display, g->compare, g->free);
     BSTNODE *temp = findBST(g->bstree, new);
     if (temp != NULL) {
-        // printf("found\n");
-        // void *returnable = getGSTVAL(getBSTNODEvalue(temp));
         void *returnable = getGSTVAL(getBSTNODEvalue(temp));
         if (getFreqGST(getBSTNODEvalue(temp)) > 1) {
             updateFreqGST(getBSTNODEvalue(temp), -1);
             g->size --;
-            // freeGSTVAL(new);
-            // printf("RETURNING: \n");
-            // g->display(returnable, stdout);
-            // printf("\n");
             freeGSTVALalmost(new);
             return returnable;
-            // return getGSTVAL(getBSTNODEvalue(temp));
         }
         else {
             temp = swapToLeafBST(g->bstree, temp);
             pruneLeafBST(g->bstree, temp);
             setBSTsize(g->bstree, sizeBST(g->bstree)-1);
             g->size --;
-            // returnable = freeGSTVALalmost(new);
-            // printf("RETURNING after swap and prune: \n");
-            // g->display(returnable, stdout);
-            // printf("\n");
             freeGSTVALalmost(new);
             freeBSTNODE(temp, g->free);
             return returnable;
-            // return getGSTVAL(getBSTNODEvalue(temp));
         }
     }
     else {
-        // printf("Value ");
-        // new->display(value, stdout);
-        // printf(" not found!!!!\n");
-        // freeGSTVAL(new);
         freeGSTVALalmost(new);
         return NULL;
     }

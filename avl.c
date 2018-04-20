@@ -12,7 +12,6 @@ typedef struct aval
     int balance;
     void (*display)(void *,FILE *);          //display
     int (*compare)(void *,void *);           //comparator
-    // void (*swap)(BSTNODE *,BSTNODE *);     //swapper
     void (*free)(void *);
 } AVAL;
 
@@ -49,7 +48,6 @@ void rightRotate(BST *,BSTNODE *,BSTNODE *);
 void adisplay(void *val, FILE *fp) {
     AVAL *temp = val;
     temp->display(getAVAL(temp), fp);
-    // printf("{%d}", getHeight(temp));
     if (getFREQ(temp) > 1) {
         fprintf(fp, "[%d]", getFREQ(temp));
     }
@@ -132,11 +130,6 @@ int getBalance(AVAL *val) {
 }
 
 void setBalance(BSTNODE *node) {
-    // AVAL *temp = getBSTNODEvalue(node);
-    // printf("setting balance for : ");
-    // temp->display(getAVAL(temp), stdout);
-    // printf("\n");
-
     calculateHeight(node);
 
     BSTNODE *l = getBSTNODEleft(node);
@@ -144,71 +137,49 @@ void setBalance(BSTNODE *node) {
 
     AVAL *val = getBSTNODEvalue(node);
     if (l!=NULL && r!=NULL) {
-        // printf("left height: %d, right height: %d\n", getHeight(getBSTNODEvalue(l)), getHeight(getBSTNODEvalue(r)));
         val->balance = getHeight(getBSTNODEvalue(l)) - getHeight(getBSTNODEvalue(r));
     }
     else if (l!=NULL && r==NULL) {
-        // printf("left height: %d\n", getHeight(getBSTNODEvalue(l)));
         val->balance = getHeight(getBSTNODEvalue(l)) + 1;
     }
     else if (r!= NULL && l == NULL) {
-        // printf("right height: %d\n", getHeight(getBSTNODEvalue(r)));
         val->balance = (-1) - getHeight(getBSTNODEvalue(r));
     }
     else {
-        // printf("no children, setting balance to 0\n");
         val->balance = 0;
     }
-    // calculateHeight(node);
     return;
 }
 
 void calculateHeight(BSTNODE *node) {
-    // printf("\n\ncalculating heights\nNODE: ");
-    // AVAL *temp = getBSTNODEvalue(node);
-    // temp->display(getAVAL(temp), stdout);
-    // printf("\n");
     BSTNODE *l = getBSTNODEleft(node);
     BSTNODE *r = getBSTNODEright(node);
 
     if (node == NULL) {return;}
     if (l == NULL && r == NULL) {
-        // printf("both null\n");
         setHeight(getBSTNODEvalue(node), 0);
-        // setBalance(node);
         return;
     }
     else if (l != NULL && r == NULL) {
-        // printf("left isnt' null\n");
-        // addHeight(getBSTNODEvalue(node), getHeight(getBSTNODEvalue(l))+1);
         setHeight(getBSTNODEvalue(node), getHeight(getBSTNODEvalue(l))+1);
     }
     else if (r != NULL && l == NULL) {
-        // printf("right isnt' null\n");
-        // addHeight(getBSTNODEvalue(node), getHeight(getBSTNODEvalue(r))+1);
         setHeight(getBSTNODEvalue(node), getHeight(getBSTNODEvalue(r))+1);
     }
     else {
-        // printf("TWO CHILDREN\n");
         int numl = getHeight(getBSTNODEvalue(l));
         int numr = getHeight(getBSTNODEvalue(r));
-        // printf("height left: %d, height right: %d\n", numl, numr);
         if (numl > numr) {
-            // addHeight(getBSTNODEvalue(node), numl+1);
             setHeight(getBSTNODEvalue(node), numl+1);
         }
         else {
-            // addHeight(getBSTNODEvalue(node), numr+1);
             setHeight(getBSTNODEvalue(node), numr+1);
         }
     }
-    // printf("height is now %d\n", getHeight(getBSTNODEvalue(node)));
-    // setBalance(node);
     return;
 }
 
 BSTNODE *findFavorite(BSTNODE *node) {
-    // setBalance(node);
     if (node == NULL) {return NULL;}
     else if (getBalance(getBSTNODEvalue(node)) >= 1) {
         return getBSTNODEleft(node);
@@ -269,7 +240,6 @@ struct avl
     BST *bstree;
     void (*display)(void *,FILE *);          //display
     int (*compare)(void *,void *);           //comparator
-    // void (*swap)(BSTNODE *,BSTNODE *);    //swapper
     void (*free)(void *);                    //free
 };
 
@@ -293,7 +263,6 @@ insertAVL(AVL *a,void *value) {
     BSTNODE *temp = findBST(a->bstree, new);
 
     if (temp != NULL) {
-        // printf("already in the free\n");
         updateFREQ(getBSTNODEvalue(temp), 1);
         a->size ++;
         freeAVALalmost(new);
@@ -307,38 +276,21 @@ insertAVL(AVL *a,void *value) {
 }
 
 void insertionFixup(BST *t, BSTNODE *node) {
-    // printf("IN FIXUP with : ");
-    // AVAL *temp = getBSTNODEvalue(node);
-    // temp->display(getAVAL(temp), stdout);
-    // printf("\ntree looks like: \n");
-    // displayBSTdecorated(t, stdout);
-    // printf("\n");
     while (1) {
-        // printf("\nin the while with : ");
-        // AVAL *temp = getBSTNODEvalue(node);
-        // temp->display(getAVAL(temp), stdout);
-        // printf("\n");
-
         BSTNODE *parent = getBSTNODEparent(node);
         BSTNODE *fav = findFavorite(node);
         BSTNODE *sibling = getSibling(node);
 
-        // if (getBSTroot(t) == node) {
         if (parent == node) {
-            // printf("it's the root\n");
             setBalance(node);
             break;
         }
         else if (findFavorite(parent) != NULL && findFavorite(parent) == sibling) { //case 1
-            // printf("case 1\n");
             setBalance(parent);
             break;
         }
         else if (findFavorite(parent) == NULL) { // case 2
-            // printf("case 2\n");
             setBalance(parent);
-            // temp->display(getAVAL(getBSTNODEvalue(parent)), stdout);
-            // printf("'s balance is now: %d\n", getBalance(getBSTNODEvalue(parent)));
             node = parent;
             continue;
         }
@@ -353,24 +305,13 @@ void insertionFixup(BST *t, BSTNODE *node) {
                 setBalance(node);
             }
             else { //case 4
-                // printf("case 4\n");
-                // printf("before rotating, tree looks like: \n");
-                // displayBSTdecorated(t, stdout);
-                // printf("\n");
                 rotate(t, node, parent);
                 setBalance(parent);
                 setBalance(node);
-                // setBalance(getBSTNODEparent(node));
-                // printf("after rotating, tree looks like: \n");
-                // displayBSTdecorated(t, stdout);
-                // printf("\n");
             }
             break;
         }
     }
-    // printf("after fixup: \n");
-    // displayBSTdecorated(t, stdout);
-    // printf("---------------------\n");
     return;
 }
 
@@ -398,14 +339,6 @@ void rotate(BST *t, BSTNODE *src, BSTNODE *dst) {
 }
 
 void leftRotate(BST *t, BSTNODE *y, BSTNODE *x) {
-    // printf("left rotating!\n");
-    // AVAL *t1 = getBSTNODEvalue(y);
-    // AVAL *t2 = getBSTNODEvalue(x);
-    // t1->display(getAVAL(t1), stdout);
-    // printf(" and ");
-    // t1->display(getAVAL(t2), stdout);
-    // printf("\n");
-
     BSTNODE *yLeft = getBSTNODEleft(y);
     BSTNODE *xParent = getBSTNODEparent(x);
 
@@ -431,22 +364,12 @@ void leftRotate(BST *t, BSTNODE *y, BSTNODE *x) {
     setBSTNODEleft(y, x);
     setBSTNODEparent(x, y);
 
-    // printf("rotated\n");
-
     calculateHeight(x);
     calculateHeight(y);
     return;
 }
 
 void rightRotate(BST *t, BSTNODE *y, BSTNODE *x) {
-    // printf("right rotating!\n");
-    // AVAL *t1 = getBSTNODEvalue(y);
-    // AVAL *t2 = getBSTNODEvalue(x);
-    // t1->display(getAVAL(t1), stdout);
-    // printf(" and ");
-    // t1->display(getAVAL(t2), stdout);
-    // printf("\n");
-
     BSTNODE *yRight = getBSTNODEright(y);
     BSTNODE *xParent = getBSTNODEparent(x);
 
@@ -472,8 +395,6 @@ void rightRotate(BST *t, BSTNODE *y, BSTNODE *x) {
     setBSTNODEright(y, x);
     setBSTNODEparent(x, y);
 
-    // printf("rotated\n");
-
     calculateHeight(x);
     calculateHeight(y);
 
@@ -493,7 +414,6 @@ deleteAVL(AVL *a,void *value) {
             return NULL;
         }
         else {
-            // printf("has freq 1\n");
             temp = swapToLeafBST(a->bstree, temp);
             deleteFixup(a->bstree, temp);
             pruneLeafBST(a->bstree, temp);
@@ -503,56 +423,31 @@ deleteAVL(AVL *a,void *value) {
 
             freeAVALalmost(new);
             freeBSTNODE(temp, a->free);
-
-            // printf("after PRUNE: \n");
-            // displayBSTdecorated(a->bstree, stdout);
-            // printf("\n");
-
             return returnable;
         }
     }
     else {
-        // updateFREQ(getBSTNODEvalue(temp), 1);
         freeAVALalmost(new);
         return NULL;
     }
 }
 
 void deleteFixup(BST *t, BSTNODE *node) {
-    // printf("\nIN DELETE FIXUP with : ");
-    // AVAL *temp = getBSTNODEvalue(node);
-    // temp->display(getAVAL(temp), stdout);
-    // printf("\ntree looks like: \n");
-    // displayBSTdecorated(t, stdout);
-    // printf("\n");
-
-    // int h = getHeight(getBSTNODEvalue(node));
-    // printf("HEIGHT: %d\n", h);
     setHeight(getBSTNODEvalue(node), -1);
 
-
     while (1) {
-        // printf("NODE: ");
-        // AVAL *temp = getBSTNODEvalue(node);
-        // temp->display(getAVAL(temp), stdout);
-        // printf("\n");
-
         BSTNODE *parent = getBSTNODEparent(node);
         BSTNODE *sibling = getSibling(node);
 
-        // if (getBSTroot(t) == node) {
         if (parent == node) {
-            // printf("at the root node\n");
             break;
         }
         else if (findFavorite(parent)!=NULL && findFavorite(parent) == node) { //case 1
-            // printf("parent's favorite is the node, case 1\n");
             setBalance(parent);
             node = parent;
             continue;
         }
         else if (findFavorite(parent) == NULL) { //case 2
-            // printf("parent has no favorite, case 2\n");
             setBalance(parent);
             break;
         }
@@ -560,10 +455,8 @@ void deleteFixup(BST *t, BSTNODE *node) {
             BSTNODE *fav = findFavorite(sibling);
             if (fav != NULL && isLinear(sibling, parent, fav) == 0) { // case 3
                 if (fav != sibling) {
-                    // printf("case 3\n");
                     rotate(t, fav, sibling);
                     rotate(t, fav, parent);
-                    // printf("rotated\n");
                     setBalance(parent);
                     setBalance(sibling);
                     setBalance(fav);
@@ -572,16 +465,9 @@ void deleteFixup(BST *t, BSTNODE *node) {
                 }
             }
             else { //case 4
-                // printf("case 4\n");
-                // printf("before rotating, tree looks like: \n");
-                // displayBSTdecorated(t, stdout);
-                // printf("\n");
                 rotate(t, sibling, parent);
                 setBalance(parent);
                 setBalance(sibling);
-                // printf("after rotating, tree looks like: \n");
-                // displayBSTdecorated(t, stdout);
-                // printf("\n");
                 if (fav == NULL) {
                     break;
                 }
@@ -590,9 +476,6 @@ void deleteFixup(BST *t, BSTNODE *node) {
             }
         }
     }
-    // printf("after DELETE fixup, tree looks like: \n");
-    // displayBSTdecorated(t, stdout);
-    // printf("\n");
     return;
 }
 
@@ -632,7 +515,6 @@ sizeAVL(AVL *a) {
 
 extern int
 duplicatesAVL(AVL *a) {
-    // printf("AVL SIZE: %d\nBST SIZE : %d\n", sizeAVL(a), sizeBST(a->bstree));
     return a->size - sizeBST(a->bstree);
 }
 

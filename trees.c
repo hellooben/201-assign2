@@ -26,14 +26,11 @@ int main (int argc, char **argv) {
         return 0;
     }
     else {
-        // printf("TREE: %d\n", argv[1][1]);
         switch (argv[1][1]) {
             case 103:
-                // printf("gst!\n");
                 tree = 1;
                 break;
             case 114:
-                // printf("avl!\n");
                 tree = 0;
                 break;
         }
@@ -43,7 +40,6 @@ int main (int argc, char **argv) {
 
     if (tree == 0) { //AVL tree
         AVL *avl = newAVL(displaySTRING, compareSTRING, freeSTRING);
-        // printf("AVL!\n");
 
         int str = stringPending(data);
         char *temp = processString(str, data);
@@ -72,11 +68,9 @@ int main (int argc, char **argv) {
     }
     else { //Green tree
         GST *gst = newGST(displaySTRING, compareSTRING, freeSTRING);
-        // printf("GST!\n");
 
         int str = stringPending(data);
         char *temp = processString(str, data);
-        // printf("TEMP after cleaning: %s\n", temp);
         processInsertGST(temp, gst);
 
         str = stringPending(data);
@@ -86,29 +80,17 @@ int main (int argc, char **argv) {
             str = stringPending(data);
         }
 
-        // printf("out of the first while\ntree looks like: \n");
-        // displayGST(gst, stdout);
-        // printf("\n\n");
-
         str = stringPending(commands);
         temp = processString(str, commands);
-        // printf("TEMP after cleaning: %s\n", temp);
-        // if (temp [0] != 32) {
-            // printf("going to process commands\n");
         processCommandsGST(gst, temp, commands);
-        // }
 
         str = stringPending(commands);
         while (!feof(commands)) {
             temp = processString(str, commands);
-            // if (temp [0] != 32) {
-                // printf("going to process commands\n");
             processCommandsGST(gst, temp, commands);
-            // }
             str = stringPending(commands);
         }
     }
-
     return 0;
 }
 
@@ -116,26 +98,22 @@ int main (int argc, char **argv) {
 
 void processInsertGST(char *str, GST *tree) {
     if (isalpha(str[0])) {
-        // printf("inserting %s\n\n", str);
         STRING *new = newSTRING(str);
         insertGST(tree, new);
         return;
     }
     else {
-        // printf("NOT INSERTING %s\n\n", str);
         return;
     }
 }
 
 void processInsertAVL(char *str, AVL *tree) {
     if (isalpha(str[0])) {
-        // printf("inserting %s\n\n", str);
         STRING *new = newSTRING(str);
         insertAVL(tree, new);
         return;
     }
     else {
-        // printf("NOT INSERTING %s\n\n", str);
         return;
     }
 }
@@ -143,13 +121,11 @@ void processInsertAVL(char *str, AVL *tree) {
 char *processString(int x, FILE *fp) {
     char *str;
     if (x == 0) {
-        // printf("not a double quote\n");
         str = readToken(fp);
         cleanToken(str);
         return str;
     }
     else {
-        // printf("double quote\n");
         str = readString(fp);
         cleanString(str);
         return str;
@@ -157,10 +133,8 @@ char *processString(int x, FILE *fp) {
 }
 
 void cleanToken(char *str) {
-    // int size = sizeof(str)/sizeof(char *);
     int size = strlen(str);
     int pos = 0;
-    // printf("TOKEN SIZE : %d\nTOKEN: .%s.\n", size, str);
     for (int i=0; i<size; i++) {
         if (isalpha(str[i])) {
             if (isupper(str[i])) {
@@ -174,25 +148,19 @@ void cleanToken(char *str) {
         else continue;
     }
     str[pos] = '\0';
-    // printf("TOKEN AFTER CLEANING: .%s.\n", str);
     return;
 }
 
 void cleanString(char *str) {
-    // int size = sizeof(str)/sizeof(char *);
     int size = strlen(str);
     int pos = 0;
     int space = 0;
-    // printf("STR SIZE : %d\nSTRING: .%s.\n", size, str);
     for (int i=0; i<size; i++) {
         if (str[i] == 32) {
             if (space != 0) {
-                // if (str[i+1] != 32 && i != size-1) {
-                // if (isalpha(str[i+1]) && i != size -1) {
                 space = 0;
                 str[pos] = str[i];
                 pos ++;
-                // }
             }
             else continue;
         }
@@ -215,9 +183,6 @@ void cleanString(char *str) {
     else {
         str[pos] = '\0';
     }
-
-
-    // printf("POS: %d, STRING AFTER CLEANING: .%s.\n", pos, str);
     return;
 }
 
@@ -232,9 +197,7 @@ void processCommandsAVL(AVL *tree, char *temp, FILE *fp) {
     }
     else if (num == 100) {
         str = stringPending(fp);
-        // printf("result of pending: %d\n", str);
         temp = processString(str, fp);
-        // printf("TEMP after cleaning: %s\n", temp);
         STRING *delete = newSTRING(temp);
         void *del = findAVL(tree, delete);
         if (del == NULL && isalpha(temp[0])) {
@@ -265,7 +228,6 @@ void processCommandsAVL(AVL *tree, char *temp, FILE *fp) {
 }
 
 void processCommandsGST(GST *tree, char *temp, FILE *fp) {
-    // printf("PROCESSING COMMANDS GST with %s\n", temp);
     int str = 0;
     int num = temp[0];
 
@@ -276,9 +238,7 @@ void processCommandsGST(GST *tree, char *temp, FILE *fp) {
     }
     else if (num == 100) {
         str = stringPending(fp);
-        // printf("result of pending: %d\n", str);
         temp = processString(str, fp);
-        // printf("TEMP after cleaning: %s\n", temp);
         STRING *delete = newSTRING(temp);
         void *del = findGST(tree, delete);
         if (del == NULL && isalpha(temp[0])) {
